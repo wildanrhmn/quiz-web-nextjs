@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Container, Row, Col, Button, Stack } from 'react-bootstrap'
 import shuffle from 'lodash'
+import Timer from '@/components/Timer'
 
 function Main({ questionData }){
   const [currentQuestion, setCurrentQuestion] = useState(0)
@@ -12,6 +13,11 @@ function Main({ questionData }){
   const [score, setScore] = useState(0) 
   const [showScore, setShowScore] = useState(false)
   const router = useRouter()
+  const DURATION = 10
+  
+  const handleTimeout = () => {
+    setShowScore(true)
+  }
 
   const handleAnswer = (isCorrect) => {
     if(currentQuestion < questionData.length - 1){
@@ -32,20 +38,36 @@ function Main({ questionData }){
   },[question])
  
   if(showScore){
-    return <p>{score}</p>
+    return(
+      <Container className={Styles.main}>
+          <div style={{
+            display: 'flex',
+            flexDirection:'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            <div>
+              <p className={Styles.scoreText}>You have Scored : {score}</p>
+            </div>
+              <Button className={Styles.buttonAJG} onClick={() => window.location.reload()}>Reset quiz</Button>
+          </div>
+
+      </Container>
+    )
   }
   return(
       <Container className={Styles.main}>
+            <Timer duration={DURATION} onTimeOut={handleTimeout} />
             <div style={{display: 'flex'}}>
               <div className={Styles.question} style={{display:'flex', justifyContent:'center',alignItems: 'center'}}> 
-                    <p>{question.question.replace(/&quot;|&#039;/g,"\"")}</p>
+                    <p>{question.question.replace(/&quot;|&#039;|&amp;/g,"\"")}</p>
               </div>
                   <div>
                       <Stack gap={2}>
                        {shuffledAnswers.map((answer) => (
                         <Button key={answer} className={Styles.buttonAJG}
                         onClick={() => handleAnswer(answer === question.correct_answer)}>
-                          {answer}
+                          {answer.replace(/&quot;|&#039;|&amp;/g,"\"")}
                         </Button>
                        ))}
                       </Stack>
