@@ -1,0 +1,48 @@
+.LoginContainer{
+    width: 400px;
+    padding: 25px 15px;
+    height: 500px;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    background-color: #e8e4e6;
+    border-radius: 12px;
+    border: 5px solid #001e1d;
+}
+
+.FormControl{
+    background-color: #004643;
+    color: #abd1c6;
+    border: 2px solid #001e1d;
+}
+
+.FormControl:focus{
+    background-color: #004643;
+    color: #abd1c6;
+    font-size: 13px;
+}
+
+.formLabel{
+    color: #e8e4e6;
+    font-size: 14px;
+}
+
+.ButtonLogin{
+    padding: 15px 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 25px !important;
+    background-color: #001e1d;
+    color:#e8e4e6 ;
+    border: 2px solid #001e1d;
+    transition:  .3s;
+}
+
+.ButtonLogin:hover{
+    background-color: #e8e4e6;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+}

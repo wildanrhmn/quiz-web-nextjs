@@ -5,19 +5,31 @@ import { useRouter } from 'next/router'
 import { Container, Row, Col, Button, Stack } from 'react-bootstrap'
 import shuffle from 'lodash'
 import Timer from '@/components/Timer'
+import { useCookies } from 'react-cookie'
+
 
 function Main({ questionData }){
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [shuffledAnswers, setShuffledAnswers] = useState([])
   const question = questionData[currentQuestion]
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const [score, setScore] = useState(0) 
   const [showScore, setShowScore] = useState(false)
   const router = useRouter()
-  const DURATION = 10
-  
+  const DURATION = 20
   const handleTimeout = () => {
     setShowScore(true)
   }
+
+  const handleLogout = () => {
+    removeCookie('user')
+    router.push('/login')
+  }
+  useEffect(() => {
+    if(cookies.user === undefined){
+      router.push('/login')
+    }
+  }, [])
 
   const handleAnswer = (isCorrect) => {
     if(currentQuestion < questionData.length - 1){
@@ -49,14 +61,17 @@ function Main({ questionData }){
             <div>
               <p className={Styles.scoreText}>You have Scored : {score}</p>
             </div>
+            <div style={{display: 'flex', gap: '15px'}}>
               <Button className={Styles.buttonAJG} onClick={() => window.location.reload()}>Reset quiz</Button>
+              <Button className={Styles.buttonAJG} onClick={handleLogout}>Logout</Button>
+            </div>
           </div>
 
       </Container>
     )
   }
   return(
-      <Container className={Styles.main}>
+    <Container className={Styles.main}>
             <Timer duration={DURATION} onTimeOut={handleTimeout} />
             <div style={{display: 'flex'}}>
               <div className={Styles.question} style={{display:'flex', justifyContent:'center',alignItems: 'center'}}> 
