@@ -1,107 +1,57 @@
-import Styles from '../styles/Home.module.css'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { Container, Row, Col, Button, Stack } from 'react-bootstrap'
-import shuffle from 'lodash'
-import Timer from '@/components/Timer'
+import { useState } from 'react';
+import axios from 'axios';
+import Styles from '../styles/Login.module.scss'
+import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie'
+import { Form, FloatingLabel, Button } from 'react-bootstrap';
+import Cookies from 'js-cookie';
+import { useDispatch } from 'react-redux';
+import { AsyncLogin } from '@/states/auth/middleware';
 
-
-function Main({ questionData }){
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [shuffledAnswers, setShuffledAnswers] = useState([])
-  const question = questionData[currentQuestion]
+export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
-  const [score, setScore] = useState(0) 
-  const [showScore, setShowScore] = useState(false)
-  const router = useRouter()
-  const DURATION = 20
-  const handleTimeout = () => {
-    setShowScore(true)
-  }
+  const router = useRouter();
+  const [error, isError] = useState(false)
+  const dispatch = useDispatch()
 
-  const handleLogout = () => {
-    removeCookie('user')
-    router.push('/login')
-  }
-  useEffect(() => {
-    if(cookies.user === undefined){
-      router.push('/login')
-    }
-  }, [])
-
-  const handleAnswer = (isCorrect) => {
-    if(currentQuestion < questionData.length - 1){
-      setCurrentQuestion(currentQuestion + 1);
-    } else{
-      setShowScore(true)
-    }
-    if(isCorrect){
-      setScore(score + 1)
-      console.info("benar!")
-    }
-  }
-
-  useEffect(() => {
-    const answers = shuffle([...question.incorrect_answers, question.correct_answer])
-    const finalAnswers = answers.value()
-    setShuffledAnswers(finalAnswers)
-  },[question])
- 
-  if(showScore){
-    return(
-      <Container className={Styles.main}>
-          <div style={{
-            display: 'flex',
-            flexDirection:'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-            <div>
-              <p className={Styles.scoreText}>You have Scored : {score}</p>
-            </div>
-            <div style={{display: 'flex', gap: '15px'}}>
-              <Button className={Styles.buttonAJG} onClick={() => window.location.reload()}>Reset quiz</Button>
-              <Button className={Styles.buttonAJG} onClick={handleLogout}>Logout</Button>
-            </div>
-          </div>
-
-      </Container>
-    )
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+      try {
+        dispatch(AsyncLogin({email, password}))
+        router.push('/dashboard')
+    
+      } catch (error) {
+        isError(true)
+        return false;
+        console.info("test")
+      }
+    };
+     
   return(
-    <Container className={Styles.main}>
-            <Timer duration={DURATION} onTimeOut={handleTimeout} />
-            <div style={{display: 'flex'}}>
-              <div className={Styles.question} style={{display:'flex', justifyContent:'center',alignItems: 'center'}}> 
-                    <p>{question.question.replace(/&quot;|&#039;|&amp;/g,"\"")}</p>
-              </div>
-                  <div>
-                      <Stack gap={2}>
-                       {shuffledAnswers.map((answer) => (
-                        <Button key={answer} className={Styles.buttonAJG}
-                        onClick={() => handleAnswer(answer === question.correct_answer)}>
-                          {answer.replace(/&quot;|&#039;|&amp;/g,"\"")}
-                        </Button>
-                       ))}
-                      </Stack>
-                  </div>
+    <div className={Styles.LoginContainer}>
+        <h1 className='text-center pb-5'>Login</h1>
+        {error && (
+          <p className='text-center text-danger pb-1'>Wrong Credentials</p>
+        )}
+        <Form onSubmit={handleSubmit}>
+
+          <Form.Group className='mb-3'>
+            <FloatingLabel label="email address" className={Styles.formLabel}>
+                <Form.Control className={Styles.FormControl} value={email} type="email" onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Form.Group className='mb-5'>
+            <FloatingLabel label="password" className={Styles.formLabel}>
+                <Form.Control className={Styles.FormControl} value={password} type="password" onChange={(e) => setPassword(e.target.value)} placeholder="password" />
+            </FloatingLabel>
+          </Form.Group>
+
+          <Button type='submit' className={Styles.ButtonLogin}>Login</Button>
+        </Form>
               
-            </div>
-      </Container>
+    </div>
   )
-}
-
-export default Main
-
-export async function getStaticProps(){
-  const response = await axios.
-  get('https://opentdb.com/api.php?amount=10&category=31&difficulty=easy&type=multiple')
-  
-  return{
-    props:{
-      questionData: response.data.results,
-    },
   }
-}

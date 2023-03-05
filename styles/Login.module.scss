@@ -28,7 +28,7 @@
     font-size: 14px;
 }
 
-.ButtonLogin{
+@mixin ButtonNih(){
     padding: 15px 45px;
     display: flex;
     justify-content: center;
@@ -39,10 +39,14 @@
     color:#e8e4e6 ;
     border: 2px solid #001e1d;
     transition:  .3s;
+
+    &:hover{
+        background-color: #e8e4e6;
+        color: #001e1d;
+        border: 2px solid #001e1d;
+    }
 }
 
-.ButtonLogin:hover{
-    background-color: #e8e4e6;
-    color: #001e1d;
-    border: 2px solid #001e1d;
+.ButtonLogin{
+    @include ButtonNih;
 }
